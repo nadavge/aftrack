@@ -3,6 +3,8 @@ import os
 
 SECRET_KEY_LEN = 24
 SECRET_KEY_FILE = 'secret_key'
+# TODO remove after deployment in case of other database
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 def create_key_file():
 	""" Creates a key file for session handling.
@@ -22,7 +24,9 @@ class Config(object):
 	DEBUG = False
 	TESTING = False
 	CSRF_ENABLED = True
-	
+	# TODO remove after deployment in case of other database
+	SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(os.path.join(BASEDIR, 'aftrack.db'))  
+	 
 	def __init__(self):
 		try:
 			with open(SECRET_KEY_FILE, 'rb') as secret_key_file:
@@ -37,15 +41,15 @@ class ProductionConfig(Config):
 
 
 class StagingConfig(Config):
-    DEVELOPMENT = True
-    DEBUG = True
+	DEVELOPMENT = True
+	DEBUG = True
 
 
 class DevelopmentConfig(Config):
-    DEVELOPMENT = True
-    DEBUG = True
+	DEVELOPMENT = True
+	DEBUG = True
 
 
 class TestingConfig(Config):
-    TESTING = True
+	TESTING = True
 
