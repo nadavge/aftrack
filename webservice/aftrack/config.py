@@ -1,5 +1,6 @@
 import sys
 import os
+from datetime import timedelta
 
 SECRET_KEY_LEN = 24
 SECRET_KEY_FILE = 'secret_key'
@@ -24,6 +25,7 @@ class Config(object):
 	DEBUG = False
 	TESTING = False
 	CSRF_ENABLED = True
+	MAX_COOKIE_AGE = timedelta(days=30).total_seconds()
 	# TODO remove after deployment in case of other database
 	SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(os.path.join(BASEDIR, 'aftrack.db'))  
 	 
