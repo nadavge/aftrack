@@ -3,9 +3,12 @@ from flask.ext.login import make_secure_token, UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 from itsdangerous import TimedSerializer
 from datetime import time, datetime, timedelta
+from sqlalchemy import func
 
 PASSWORD_HASH_LEN = 66 # Based on generate_password_hash output
 NEW_DAY_TIME = time(6,0) # 06:00 (AM)
+
+
 
 class User(db.Model, UserMixin):
 	id = db.Column(db.Integer, primary_key=True)
@@ -15,6 +18,16 @@ class User(db.Model, UserMixin):
 	yearbook = db.Column(db.Integer)
 	admin = db.Column(db.Boolean, default=False) 
 	afters = db.relationship('After', backref='user')
+
+	@staticmethod
+	def authenticate(self, username, password):
+		"""Authenticate a user through a login form of some sort"""
+		user = User.query.filter(
+			func.lower(User.username) == func.lower(username)
+		).first()
+		if user and user.check_password(password):
+			return user
+		return None
 
 	@property
 	def hmac(self):
@@ -35,7 +48,6 @@ class User(db.Model, UserMixin):
 
 		note: doesn't handle commiting to db """
 		self.password = generate_password_hash(password)
-
 
 
 @login_manager.user_loader
@@ -59,6 +71,7 @@ def load_token(token):
 		pass
 
 	return None
+
 
 
 class After(db.Model):
