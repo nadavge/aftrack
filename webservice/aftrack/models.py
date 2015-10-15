@@ -14,13 +14,14 @@ class User(db.Model, UserMixin):
 	id = db.Column(db.Integer, primary_key=True)
 	username = db.Column(db.String(16), unique=True)
 	password = db.Column(db.String(66))
-	fullname = db.Column(db.String(32))
+	first_name = db.Column(db.String(12))
+	last_name = db.Column(db.String(20))
 	yearbook = db.Column(db.Integer)
 	admin = db.Column(db.Boolean, default=False) 
 	afters = db.relationship('After', backref='user')
 
 	@staticmethod
-	def authenticate(self, username, password):
+	def authenticate(username, password):
 		"""Authenticate a user through a login form of some sort"""
 		user = User.query.filter(
 			func.lower(User.username) == func.lower(username)

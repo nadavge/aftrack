@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<form method="post" class="container col-sm-4 col-sm-offset-4">
+	<div class="text-center">
+		<h3 class="page-header"> Welcome back<span class="hidden-xs">, please login!</span></h3>
+	</div>
+	{% if error %}
+		<div class='alert alert-danger'>{{ error }}</div>
+	{% endif %}
+
+	{{ form.hidden_tag() }}
+	{{ form.username(class_="form-control", placeholder="Username") }}
+	{% if form.username.errors %}
+		<div class="alert alert-sm alert-danger">
+		{% for error in form.username.errors %}
+			{{ error }}
+			{% if not loop.last %}<br/>{% endif %}
+		{% endfor %}
+		</div>
+	{% endif %}
+	{{ form.password(class_="form-control", placeholder="Password") }}
+	{% if form.password.errors %}
+		<div class="alert alert-sm alert-danger">
+		{% for error in form.password.errors %}
+			{{ error }}
+			{% if not loop.last %}<br/>{% endif %}
+		{% endfor %}
+		</div>
+	{% endif %}
+	<input type="submit" class="btn btn-success btn-block" value="Login">
+	<hr>
+	<a class="" href="#">Forgot password?</a>
+	<a class="pull-right" href="#">Signup now?</a>
+</form>
+{% endblock %}

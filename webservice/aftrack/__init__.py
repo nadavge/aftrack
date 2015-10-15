@@ -10,6 +10,8 @@ app.config.from_object(DevelopmentConfig)
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()
-# TODO setup login view
-# login_manager.login_view = "NAME"
+login_manager.login_view = 'login'
 login_manager.init_app(app)
+
+from aftrack import views
+
