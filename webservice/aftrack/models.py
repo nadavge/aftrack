@@ -11,6 +11,15 @@ NEW_DAY_TIME = time(6,0) # 06:00 (AM)
 
 
 class User(db.Model, UserMixin):
+	MIN_USERNAME = 5
+	MIN_PASSWORD = 8
+	MIN_FIRST_NAME = 2
+	MIN_LAST_NAME = 2
+	MAX_USERNAME = 16
+	MAX_PASSWORD = 20
+	MAX_FIRST_NAME = 12
+	MAX_LAST_NAME = 20
+
 	id = db.Column(db.Integer, primary_key=True)
 	username = db.Column(db.String(16), unique=True)
 	password = db.Column(db.String(66))
@@ -29,6 +38,17 @@ class User(db.Model, UserMixin):
 		if user and user.check_password(password):
 			return user
 		return None
+
+	def __init__(self, username, password, first_name, last_name,
+			yearbook, admin=False):
+		"""Construct a now user, based on given parameters.
+		Password is generated, and there's no need to use the set_password"""
+		self.username = username
+		self.set_password(password)
+		self.first_name = first_name
+		self.last_name = last_name
+		self.yearbook = yearbook
+		self.admin = admin
 
 	@property
 	def hmac(self):
