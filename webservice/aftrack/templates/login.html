@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<form method="post" class="container col-sm-4 col-sm-offset-4">
+<form method="post" class="container col-sm-4 col-sm-offset-4" name="login">
 	<div class="text-center">
 		<h3 class="page-header"> Welcome back<span class="hidden-xs">, please login!</span></h3>
 	</div>
@@ -30,6 +30,6 @@
 	<input type="submit" class="btn btn-success btn-block" value="Login">
 	<hr>
 	<a class="" href="#">Forgot password?</a>
-	<a class="pull-right" href="#">Signup now?</a>
+	<a class="pull-right" href="{{ url_for('signup') }}">Signup now?</a>
 </form>
 {% endblock %}

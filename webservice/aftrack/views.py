@@ -1,5 +1,5 @@
-from flask import request, redirect, render_template, url_for
-from flask.ext.login import login_user, current_user
+from flask import request, redirect, render_template, url_for, flash
+from flask.ext.login import login_user, logout_user, current_user
 from aftrack import app, login_manager, db
 from aftrack.models import User
 from aftrack.forms import LoginForm, SignupForm
@@ -7,6 +7,12 @@ from aftrack.forms import LoginForm, SignupForm
 @app.route('/')
 def home():
 	return render_template('base.html')
+
+@app.route('/logout')
+def logout():
+	logout_user()
+	return redirect(url_for('home'))
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -20,11 +26,13 @@ def login():
 		user = User.authenticate(form.username.data, form.password.data)
 		if user:
 			login_user(user, remember=True)
+			flash('Welcome back {}!'.format(user.first_name),'success')
 			return redirect(redirect_url())
 
 		error='Wrong username or password.'
 
 	return render_template('login.html', form=form, error=error)
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -42,7 +50,8 @@ def signup():
 				yearbook=form.yearbook.data)
 		db.session.add(user)
 		db.session.commit()
-		return redirect(url_for('/login'))
+		flash('Signed-up succesfully, you may now login.', 'success')
+		return redirect(url_for('login'))
 
 	return render_template('signup.html', form=form)
 

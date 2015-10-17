@@ -27,8 +27,29 @@
 	</div>
 </nav>
 <div class="container">
+	{% block flashes %}
+		{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+				<div class="text-center">
+					{% for category, message in messages %}
+						<div class="alert alert-{{ 'info' if category=='message' else category }} alert-dismissible" role="alert">
+							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							{{ message }}
+						</div>
+					{% endfor %}
+				</div>
+			{% endif %}
+		{% endwith %}
+	{% endblock %}
 	{% block content %}
 	{% endblock %}
 </div>
+<footer class="footer">
+	<div class="container" style="padding-top:20px">
+		&copy; 2015 - Nadav Geva <a href="mailto:nadavgeva4@gmail.com">&lt;nadavgeva4@gmail.com&gt;</a>
+	</div>
+</footer>
 </body>
 </html>
