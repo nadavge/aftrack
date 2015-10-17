@@ -6,6 +6,8 @@
 	<link rel="stylesheet" type="text/css" href="static/css/style.css"/>
 	<script language="javascript" src="static/js/jquery-2.1.4.min.js"></script>
 	<script language="javascript" src="static/js/bootstrap.min.js"></script>
+	{% block extra_head %}
+	{% endblock %}
 </head>
 <body>
 <nav class="navbar navbar-inverse">
@@ -47,8 +49,8 @@
 	{% endblock %}
 </div>
 <footer class="footer">
-	<div class="container" style="padding-top:20px">
-		&copy; 2015 - Nadav Geva <a href="mailto:nadavgeva4@gmail.com">&lt;nadavgeva4@gmail.com&gt;</a>
+	<div class="container container-footer">
+		&copy; 2015, Nadav Geva <span class="hidden-xs"><a href="mailto:nadavgeva4@gmail.com">&lt;nadavgeva4@gmail.com&gt;</a></span>
 	</div>
 </footer>
 </body>

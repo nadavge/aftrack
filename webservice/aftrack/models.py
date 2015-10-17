@@ -70,6 +70,12 @@ class User(db.Model, UserMixin):
 		note: doesn't handle commiting to db """
 		self.password = generate_password_hash(password)
 
+	def get_active_after(self):
+		"""Return the active after object, None if no active after"""
+		for after in self.afters:
+			if after.end is None: return after
+		return None
+
 
 @login_manager.user_loader
 def load_user(user_id):

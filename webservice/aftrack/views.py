@@ -1,12 +1,19 @@
 from flask import request, redirect, render_template, url_for, flash
-from flask.ext.login import login_user, logout_user, current_user
+from flask.ext.login import login_user, logout_user, current_user, login_required
 from aftrack import app, login_manager, db
-from aftrack.models import User
+from aftrack.models import User, After
 from aftrack.forms import LoginForm, SignupForm
 
+
 @app.route('/')
+@login_required
 def home():
-	return render_template('base.html')
+	if current_user.admin or True:
+		afters = sorted(After.query.all(), key=lambda after: after.date)
+		return render_template('home_admin.html', afters=afters)
+
+	after = current_user.get_active_after()
+	return render_template('home.html', after=after)
 
 @app.route('/logout')
 def logout():

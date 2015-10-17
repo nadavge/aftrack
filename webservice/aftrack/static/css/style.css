@@ -7,7 +7,7 @@ html
 body
 {
 	background-color:#F9F9F9;
-	margin-bottom:90px;
+	margin-bottom:80px;
 }
 
 .navbar
@@ -30,9 +30,13 @@ footer
 {
 	position:absolute;
 	bottom:0px;
-	height:60px;
+	height:50px;
 	border-top: 1px solid #BBB;
 	background-color: #D5D5D5;
 	width:100%
 }
 
+.container-footer
+{
+	padding-top:15px;
+}
