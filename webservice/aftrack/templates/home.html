@@ -1,3 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
+{% if after %}
+	<div class="text-center">
+		<div class="row">
+			<a href="{{ url_for('end_after') }}" class="btn btn-lg btn-danger">End :(</a>
+		</div>
+		<div class="row text-muted" style="margin-top:10px">
+			You seem to be on an after from <strong>{{ after.start.strftime('%H:%M') }}</strong>.
+		</div>
+	</div>
+{% else %}
+	<div class="text-center">
+		<a href="{{ url_for('start_after') }}" class="btn btn-lg btn-info">Start!</a>
+	</div>
+{% endif %}
 {% endblock %}

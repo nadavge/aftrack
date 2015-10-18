@@ -17,8 +17,12 @@
 		</thead>
 		<tbody>
 			{% for after in afters %}
-				<tr>
-					<td>{{ after.date.strftime('%d/%m/%y') }}</td>
+				{% if after.end %}
+					<tr>
+				{% else %}
+					<tr class='warning'>
+				{% endif %}
+					<td data-value="{{ after.date.strftime('%s') }}">{{ after.date.strftime('%d/%m/%y') }}</td>
 					<td>{{ after.user.first_name }} {{ after.user.last_name }}</td>
 					<td>{{ after.start.strftime('%H:%M') }}</td>
 					<td>{{ after.end.strftime('%H:%M') if after.end != None else '--:--' }}</td>

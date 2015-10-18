@@ -8,12 +8,13 @@ from aftrack.forms import LoginForm, SignupForm
 @app.route('/')
 @login_required
 def home():
-	if current_user.admin or True:
-		afters = sorted(After.query.all(), key=lambda after: after.date)
+	if current_user.admin:
+		afters = sorted(After.query.all(), key=lambda after: after.date, reverse=True)
 		return render_template('home_admin.html', afters=afters)
 
 	after = current_user.get_active_after()
 	return render_template('home.html', after=after)
+
 
 @app.route('/logout')
 def logout():
@@ -61,6 +62,28 @@ def signup():
 		return redirect(url_for('login'))
 
 	return render_template('signup.html', form=form)
+
+
+@app.route('/after/create')
+@login_required
+def start_after():
+	after = After(user=current_user)
+	after.start_now()
+	db.session.add(after)
+	db.session.commit()
+	return redirect(redirect_url())
+
+
+@app.route('/after/end')
+@login_required
+def end_after():
+	after = current_user.get_active_after()
+	if after is None:
+		flash('No currently active after', 'danger')
+	else:
+		after.end_now()
+		db.session.commit()
+	return redirect(redirect_url())
 
 
 def redirect_url(default='home'):
