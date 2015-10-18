@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+	<div class="text-center">
+		<h3 class="page-header">Users list</h3>
+	</div>
+	<ul class="list-group">
+	{% for user in users %}
+		<a href="{{ url_for('profile', username=user.username) }}">
+			{% if user.get_active_after() %}
+				<li class="list-group-item list-group-item-warning">
+			{% else %}
+				<li class="list-group-item">
+			{% endif %}
+					{{ user.first_name }} {{ user.last_name }}
+			</li>
+		</a>
+	{% endfor %}
+	</ul>
+</div>
+{% endblock %}

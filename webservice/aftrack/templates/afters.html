@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+	<div class="text-center">
+		<h3 class="page-header">{{ month }}/{{ year }}</h3>
+	</div>
+	<nav>
+		<ul class="pager">
+			<li class="previous">
+				{% if month==1 %}
+					<a href="{{ url_for('afters', year=year-1, month=12) }}">
+						<span aria-hidden="true">&larr;</span>12/{{ year-1 }}
+					</a>
+				{% else %}
+					<a href="{{ url_for('afters', year=year, month=month-1) }}">
+						<span aria-hidden="true">&larr;</span>{{ month-1 }}/{{ year }}
+					</a>
+				{% endif %}
+			</li>
+			<li class="next">
+				{% if month==12 %}
+					<a href="{{ url_for('afters', year=year+1, month=1) }}">
+						1/{{ year+1 }}<span aria-hidden="true">&rarr;</span>
+					</a>
+				{% else %}
+					<a href="{{ url_for('afters', year=year, month=month+1) }}">
+						{{ month+1 }}/{{ year }}<span aria-hidden="true">&rarr;</span>
+					</a>
+				{% endif %}
+			</li>
+		</ul>
+	</nav>
+	{% include "_after-table.html" %}
+</div>
+{% endblock %}
