@@ -11,7 +11,7 @@ NEW_DAY_TIME = time(6,0) # 06:00 (AM)
 
 
 class User(db.Model, UserMixin):
-	MIN_USERNAME = 5
+	MIN_USERNAME = 5 # 4 or less breaks profile editing link
 	MIN_PASSWORD = 8
 	MIN_FIRST_NAME = 2
 	MIN_LAST_NAME = 2
@@ -26,7 +26,7 @@ class User(db.Model, UserMixin):
 	first_name = db.Column(db.String(12))
 	last_name = db.Column(db.String(20))
 	yearbook = db.Column(db.Integer)
-	admin = db.Column(db.Boolean, default=False) 
+	admin = db.Column(db.Boolean, default=False)
 	afters = db.relationship('After', backref='user')
 
 	@staticmethod

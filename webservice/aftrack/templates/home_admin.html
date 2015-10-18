@@ -3,16 +3,32 @@
 <link rel="stylesheet" href="/static/css/sortable-theme-bootstrap.css">
 <script language="javascript" src="/static/js/sortable.min.js"></script>
 {% endblock %}
-{% block content %}
 
+{% block content %}
+<div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+<div class="panel panel-default">
+	<div class="panel-heading">Currently on after:</div>
+	{% if on_after %}
+		<div class="panel-body">
+			<ul class="list-unstyled">
+				{% for user in on_after %}
+					<li>{{ user.first_name }} {{ user.last_name }}</li>
+				{% endfor %}
+			</ul>
+		</div>
+	{% else %}
+		No one is on after right now.
+	{% endif %}
+</div>
+</div>
 <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
 	<table class="sortable-theme-bootstrap table table-hover" data-sortable>
 		<thead>
 			<tr>
 				<th class="col-xs-3" data-sorted="true" data-sorted-direction="descending">Date</th>
 				<th class="col-xs-5">Name</th>
-				<th class="col-xs-2" data-sortable="no">From</th>
-				<th class="col-xs-2" data-sortable="no">To</th>
+				<th class="col-xs-2" data-sortable="false">From</th>
+				<th class="col-xs-2" data-sortable="false">To</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -23,7 +39,11 @@
 					<tr class='warning'>
 				{% endif %}
 					<td data-value="{{ after.date.strftime('%s') }}">{{ after.date.strftime('%d/%m/%y') }}</td>
-					<td>{{ after.user.first_name }} {{ after.user.last_name }}</td>
+					<td>
+						<a href="{{ url_for('profile', username=after.user.username) }}">
+							{{ after.user.first_name }} {{ after.user.last_name }}
+						</a>
+					</td>
 					<td>{{ after.start.strftime('%H:%M') }}</td>
 					<td>{{ after.end.strftime('%H:%M') if after.end != None else '--:--' }}</td>
 				</tr>

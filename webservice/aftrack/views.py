@@ -10,7 +10,8 @@ from aftrack.forms import LoginForm, SignupForm
 def home():
 	if current_user.admin:
 		afters = sorted(After.query.all(), key=lambda after: after.date, reverse=True)
-		return render_template('home_admin.html', afters=afters)
+		on_after = set(after.user for after in afters if after.end is None)
+		return render_template('home_admin.html', on_after=on_after, afters=afters)
 
 	after = current_user.get_active_after()
 	return render_template('home.html', after=after)
@@ -62,6 +63,31 @@ def signup():
 		return redirect(url_for('login'))
 
 	return render_template('signup.html', form=form)
+
+@app.route('/profile/edit')
+def profile_edit():
+	pass
+
+@app.route('/profile')
+@app.route('/profile/<username>')
+@login_required
+def profile(username=None):
+	if username is None:
+		user = current_user
+	else:
+		user = User.query.filter_by(username=username).first()
+		if user is None:
+			flash('Non-existent username, try again', 'danger')
+		if user != current_user and not current_user.admin:
+			flash("You don't have permission to this page", 'danger')
+			user = None
+
+	if user:
+		afters = sorted(user.afters, key=lambda after:after.date, reverse=True)
+	else:
+		afters = None
+
+	return render_template('profile.html', user=user, afters=afters)
 
 
 @app.route('/after/create')
