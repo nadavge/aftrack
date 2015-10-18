@@ -6,14 +6,9 @@
 	</div>
 	<ul class="list-group">
 	{% for user in users %}
-		<a href="{{ url_for('profile', username=user.username) }}">
-			{% if user.get_active_after() %}
-				<li class="list-group-item list-group-item-warning">
-			{% else %}
-				<li class="list-group-item">
-			{% endif %}
-					{{ user.first_name }} {{ user.last_name }}
-			</li>
+		<a class="list-group-item {{ 'list-group-item-warning' if user.get_active_after() }}"
+				href="{{ url_for('profile', username=user.username) }}">
+			{{ user.first_name }} {{ user.last_name }}
 		</a>
 	{% endfor %}
 	</ul>
