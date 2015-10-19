@@ -58,6 +58,7 @@ class User(db.Model, UserMixin):
 
 	@property
 	def hmac(self):
+		"""An hmac usefol for the token authentication through a cookie"""
 		return make_secure_token(self.username, self.password)
 
 	def local_datetime(self, utc_datetime=None):

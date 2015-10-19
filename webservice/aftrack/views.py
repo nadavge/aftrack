@@ -23,6 +23,9 @@ def access_denied(error):
 @app.route('/')
 @login_required
 def home():
+	"""Main page, admins can see who's on after, and afters from last 7 days.
+	Regular users can set whether they're on after."""
+	# TODO maybe seperate into two functions
 	if current_user.admin:
 		afters = After.query.filter(
 			After.user.has(User.yearbook==current_user.yearbook),
@@ -49,6 +52,7 @@ def home():
 @app.route('/afters')
 @login_required
 def afters_now():
+	"""Show afters from current month"""
 	if not current_user.admin:
 		abort(401)
 
@@ -61,6 +65,7 @@ def afters_now():
 @app.route('/afters/<int:year>/<int:month>')
 @login_required
 def afters(year, month):
+	"""Show afters in date range"""
 	if not current_user.admin:
 		abort(401)
 	if not 1 <= month <= 12:
@@ -89,6 +94,7 @@ def afters(year, month):
 @app.route('/users/')
 @login_required
 def users():
+	"""See the list of users from the yearbook of the admin"""
 	if not current_user.admin:
 		abort(401)
 
@@ -151,6 +157,7 @@ def signup():
 @app.route('/settings/profile/<username>', methods=['GET', 'POST'])
 @login_required
 def profile_edit(username=None):
+	"""Change user's personal information"""
 	if username:
 		user = User.get_by_username(username)
 		if not user:
@@ -185,6 +192,7 @@ def change_password():
 @app.route('/profile/<username>')
 @login_required
 def profile(username=None):
+	"""Show user's afters of all time"""
 	if username is None:
 		user = current_user
 	else:
@@ -202,6 +210,7 @@ def profile(username=None):
 @app.route('/after/edit/<int:after_id>', methods=['GET', 'POST'])
 @login_required
 def edit_after(after_id):
+	"""Edit a specific after"""
 	after = After.query.get(after_id)
 	if not after:
 		abort(404)
@@ -238,6 +247,7 @@ def edit_after(after_id):
 @app.route('/after/start')
 @login_required
 def start_after():
+	"""Start a new after"""
 	if current_user.admin:
 		abort(404)
 	after = current_user.get_active_after()
@@ -254,6 +264,7 @@ def start_after():
 @app.route('/after/end')
 @login_required
 def end_after():
+	"""End the currently running after"""
 	if current_user.admin:
 		abort(404)
 	after = current_user.get_active_after()
@@ -266,7 +277,8 @@ def end_after():
 
 
 def redirect_url(default='home'):
-    return request.args.get('next') or \
-           request.referrer or \
-           url_for(default)
+	"""Calculate the most fitting url to return to"""
+	return (request.args.get('next') or
+           request.referrer or
+           url_for(default))
 
