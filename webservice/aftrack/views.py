@@ -2,7 +2,8 @@ from flask import request, redirect, render_template, url_for, flash, abort
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from aftrack import app, login_manager, db
 from aftrack.models import User, After
-from aftrack.forms import LoginForm, SignupForm
+from aftrack.forms import (LoginForm,
+	SignupForm, ProfileEditForm, ChangePasswordForm)
 from sqlalchemy import extract
 from datetime import datetime, timedelta
 
@@ -141,9 +142,40 @@ def signup():
 
 	return render_template('signup.html', form=form)
 
-@app.route('/profile/edit')
-def profile_edit():
-	pass
+
+@app.route('/settings/profile', methods=['GET', 'POST'])
+@app.route('/settings/profile/<username>', methods=['GET', 'POST'])
+@login_required
+def profile_edit(username=None):
+	if username:
+		user = User.get_by_username(username)
+		if not user:
+			abort(404)
+	else:
+		user = current_user
+
+	form = ProfileEditForm()
+	if request.method=='POST' and form.validate():
+		user.first_name = form.first_name.data
+		user.last_name = form.last_name.data
+		db.session.commit()
+		flash('Profile changed successfully!', 'success')
+		return redirect(url_for('profile', username=user.username))
+	return render_template('profile_edit.html', form=form, user=user)
+
+
+@app.route('/settings/admin', methods=['GET', 'POST'])
+@login_required
+def change_password():
+	form = ChangePasswordForm(current_user)
+	if request.method=='POST' and form.validate():
+		current_user.set_password(form.new_password.data)
+		db.session.commit()
+		flash('Password changed successfully, login with the new password', 'success')
+		logout_user()
+		return redirect(url_for('login'))
+	return render_template('change_password.html', form=form)
+
 
 @app.route('/profile')
 @app.route('/profile/<username>')
@@ -152,7 +184,7 @@ def profile(username=None):
 	if username is None:
 		user = current_user
 	else:
-		user = User.query.filter_by(username=username).first()
+		user = User.get_by_username(username)
 		if user is None:
 			abort(404)
 		if user != current_user and not current_user.admin:
@@ -163,7 +195,7 @@ def profile(username=None):
 	return render_template('profile.html', user=user, afters=afters)
 
 
-@app.route('/after/create')
+@app.route('/after/start')
 @login_required
 def start_after():
 	after = current_user.get_active_after()

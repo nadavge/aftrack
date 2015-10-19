@@ -9,8 +9,10 @@
 	<h1 style="display:inline">
 		{{ user.first_name }} {{ user.last_name }}
 	</h1>
-		{% if user == current_user or current_user.admin %}
-			<a href="#">Edit</a>
+		{% if user == current_user %}
+			<a href="{{ url_for('profile_edit') }}">Edit</a>
+		{% elif current_user.admin %}
+			<a href="{{ url_for('profile_edit', username=user.username) }}">Edit</a>
 		{% endif %}
 </div>
 <div class="col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">

@@ -10,9 +10,11 @@ def length_kwargs(min, max):
 			'max': max,
 			'message': 'Length in range %d-%d.'%(min, max)}
 
+
 class LoginForm(Form):
 	username = TextField('Username', validators=[Required()])
 	password = PasswordField('Password', validators=[Required()])
+
 
 class SignupForm(Form):
 	username = TextField('Username', validators=[
@@ -43,3 +45,36 @@ class SignupForm(Form):
 			raise ValidationError(
 					'Username already taken.'
 			)
+
+
+class ProfileEditForm(Form):
+	first_name = TextField('First name', validators=[
+			Required(),
+			Regexp("^[A-z][A-z ',-]+$", message='Invalid characters.'),
+			Length(**length_kwargs(User.MIN_FIRST_NAME, User.MAX_FIRST_NAME))])
+	last_name = TextField('Last name', validators=[
+			Required(),
+			Regexp("^[A-z][A-z ',-]*$", message='Invalid characters.'),
+			Length(**length_kwargs(User.MIN_LAST_NAME, User.MAX_LAST_NAME))])
+
+
+class ChangePasswordForm(Form):
+	old_password = PasswordField('Old password', validators=[Required()])
+	new_password = PasswordField('New password', validators=[
+			Required(),
+			Length(**length_kwargs(User.MIN_PASSWORD, User.MAX_PASSWORD))])
+	repassword = PasswordField('Repeat password', validators=[
+			Required(),
+			EqualTo('new_password', 'Passwords don\'t match')])
+
+	def __init__(self, user):
+		super().__init__()
+		self.user = user
+
+	def validate_old_password(self, field):
+		password = field.data
+		if not self.user.check_password(password):
+			raise ValidationError(
+				'Wrong password'
+			)
+

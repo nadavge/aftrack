@@ -11,7 +11,7 @@ NEW_DAY_TIME = time(6,0) # 06:00 (AM)
 
 
 class User(db.Model, UserMixin):
-	MIN_USERNAME = 5 # 4 or less breaks profile editing link
+	MIN_USERNAME = 5
 	MIN_PASSWORD = 8
 	MIN_FIRST_NAME = 2
 	MIN_LAST_NAME = 2
@@ -32,12 +32,17 @@ class User(db.Model, UserMixin):
 	@staticmethod
 	def authenticate(username, password):
 		"""Authenticate a user through a login form of some sort"""
-		user = User.query.filter(
-			func.lower(User.username) == func.lower(username)
-		).first()
+		user = User.get_by_username(username)
 		if user and user.check_password(password):
 			return user
 		return None
+
+	@staticmethod
+	def get_by_username(username):
+		user = User.query.filter(
+			func.lower(User.username) == func.lower(username)
+		).first()
+		return user
 
 	def __init__(self, username, password, first_name, last_name,
 			yearbook, admin=False):
