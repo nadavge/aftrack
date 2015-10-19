@@ -63,6 +63,8 @@ def afters_now():
 def afters(year, month):
 	if not current_user.admin:
 		abort(401)
+	if not 1 <= month <= 12:
+		abort(404)
 
 	afters = After.query.filter(
 		After.user.has(User.yearbook==current_user.yearbook),
