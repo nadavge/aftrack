@@ -26,10 +26,10 @@ def home():
 	if current_user.admin:
 		afters = After.query.filter(
 			After.user.has(User.yearbook==current_user.yearbook),
-			After.date > (datetime.now()-timedelta(days=7)).date()
+			After.start > datetime.utcnow()-timedelta(days=7)
 		).all()
 		afters_sorted = sorted(afters,
-			key=lambda after: after.date, reverse=True)
+			key=lambda after: after.start, reverse=True)
 
 		on_after = User.query.filter(
 			User.afters.any(After.end==None),
@@ -53,8 +53,8 @@ def afters_now():
 		abort(401)
 
 	return redirect(url_for('afters',
-		year=datetime.now().year,
-		month=datetime.now().month
+		year=current_user.local_datetime().year,
+		month=current_user.local_datetime().month
 	))
 
 
@@ -66,14 +66,18 @@ def afters(year, month):
 	if not 1 <= month <= 12:
 		abort(404)
 
+	# Upper bound exclusive, lower bound inclusive
+	upper_bound = datetime(year+1, 1, 1) if month==12 else datetime(year, month+1, 1)
+	lower_bound = datetime(year, month, 1)
+
 	afters = After.query.filter(
 		After.user.has(User.yearbook==current_user.yearbook),
-		extract('year', After.date)==year,
-		extract('month', After.date)==month
+		After.start < current_user.utc_datetime(upper_bound),
+		After.start >= current_user.utc_datetime(lower_bound)
 	).all()
 
 	afters_sorted = sorted(afters,
-		key=lambda after: after.date, reverse=True)
+		key=lambda after: after.start, reverse=True)
 
 	return render_template('afters.html',
 		afters=afters_sorted,
@@ -190,7 +194,7 @@ def profile(username=None):
 		if user != current_user and not current_user.admin:
 			abort(401)
 
-	afters = sorted(user.afters, key=lambda after:after.date, reverse=True)
+	afters = sorted(user.afters, key=lambda after:after.start, reverse=True)
 
 	return render_template('profile.html', user=user, afters=afters)
 
@@ -210,9 +214,18 @@ def edit_after(after_id):
 		if not form.validate():
 			flash('Date or time format were awkward.. Try again', 'danger')
 		else:
-			after.date = datetime.strptime(form.date.data, '%d/%m/%Y').date()
-			after.start = datetime.strptime(form.start.data, '%H:%M').time()
-			after.end = datetime.strptime(form.end.data, '%H:%M').time()
+			local_date = datetime.strptime(form.date.data, '%d/%m/%Y').date()
+			local_start_time = datetime.strptime(form.start.data, '%H:%M').time()
+			local_start = datetime.combine(local_date, local_start_time)
+
+			local_end_time = datetime.strptime(form.end.data, '%H:%M').time()
+			local_end = datetime.combine(local_date, local_end_time)
+			# In case the end was after midnight
+			if local_end < local_start:
+				local_end += timedelta(days=1)
+
+			after.start = current_user.utc_datetime(local_start)
+			after.end = current_user.utc_datetime(local_end)
 			db.session.commit()
 			flash('Saved successfully!', 'success')
 			return redirect(url_for('profile',
@@ -225,6 +238,8 @@ def edit_after(after_id):
 @app.route('/after/start')
 @login_required
 def start_after():
+	if current_user.admin:
+		abort(404)
 	after = current_user.get_active_after()
 	if after:
 		flash("Weird... you asked to start an after, but you're already having one!", "danger")
@@ -239,6 +254,8 @@ def start_after():
 @app.route('/after/end')
 @login_required
 def end_after():
+	if current_user.admin:
+		abort(404)
 	after = current_user.get_active_after()
 	if after is None:
 		flash('No currently active after (0_o)', 'danger')

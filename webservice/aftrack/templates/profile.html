@@ -32,9 +32,11 @@
 				{% else %}
 					<tr class='warning'>
 				{% endif %}
-					<td data-value="{{ after.date.strftime('%s') }}">{{ after.date.strftime('%d/%m/%y') }}</td>
-					<td>{{ after.start.strftime('%H:%M') }}</td>
-					<td>{{ after.end.strftime('%H:%M') if after.end != None else '--:--' }}</td>
+					<td data-value="{{ after.start.strftime('%s') }}">
+						{{ current_user.local_datetime(after.start).strftime('%d/%m/%y') }}
+					</td>
+					<td>{{ current_user.local_datetime(after.start).strftime('%H:%M') }}</td>
+					<td>{{ current_user.local_datetime(after.end).strftime('%H:%M') if after.end != None else '--:--' }}</td>
 					<td>
 						<a href="{{ url_for('edit_after', after_id=after.id) }}" class="btn btn-sm btn-default">
 							<span class="glyphicon glyphicon-pencil"></span>

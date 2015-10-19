@@ -27,6 +27,7 @@ class User(db.Model, UserMixin):
 	last_name = db.Column(db.String(20))
 	yearbook = db.Column(db.Integer)
 	admin = db.Column(db.Boolean, default=False)
+	timezone = db.Column(db.Interval, default=timedelta(hours=3)) # Israel UTC+3
 	afters = db.relationship('After', backref='user')
 
 	@staticmethod
@@ -58,6 +59,20 @@ class User(db.Model, UserMixin):
 	@property
 	def hmac(self):
 		return make_secure_token(self.username, self.password)
+
+	def local_datetime(self, utc_datetime=None):
+		"""Converts datetime to local datetime, if no datetime given returns
+		current datetime"""
+		if utc_datetime is None:
+			utc_datetime = datetime.utcnow()
+		return utc_datetime + self.timezone
+
+	def utc_datetime(self, local_datetime=None):
+		"""Converts a local datetime to utc datetime, if no datetime given
+		returns	current datetime"""
+		if local_datetime is None:
+			return datetime.utcnow()
+		return local_datetime - self.timezone
 
 	def get_auth_token(self):
 		"""Generate auth token for cookie usage """
@@ -108,21 +123,14 @@ def load_token(token):
 
 class After(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	date = db.Column(db.Date)
-	start = db.Column(db.Time)
-	end = db.Column(db.Time)
+	start = db.Column(db.DateTime)
+	end = db.Column(db.DateTime)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 	def start_now(self):
-		"""Start the after at the current moment, handle day changes"""
-		now = datetime.now()
-		self.start = now.time()
-		self.date = now.date()
-		# Check if time is still before the day changes, if so update date
-		if now.time() < NEW_DAY_TIME:
-			self.date -= timedelta(days=1)
+		"""Start the after at the current moment"""
+		self.start = datetime.utcnow()
 
 	def end_now(self):
-		"""End the after at the current moment (only updates time)"""
-		now = datetime.now()
-		self.end = now.time()
+		"""End the after at the current moment"""
+		self.end = datetime.utcnow()

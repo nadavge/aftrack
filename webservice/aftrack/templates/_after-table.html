@@ -18,14 +18,16 @@
 			{% else %}
 				<tr class='warning'>
 			{% endif %}
-				<td data-value="{{ after.date.strftime('%s') }}">{{ after.date.strftime('%d/%m/%y') }}</td>
+				<td data-value="{{ after.start.strftime('%s') }}">
+					{{ current_user.local_datetime(after.start).strftime('%d/%m/%y') }}
+				</td>
 				<td>
 					<a href="{{ url_for('profile', username=after.user.username) }}">
 						{{ after.user.first_name }} {{ after.user.last_name }}
 					</a>
 				</td>
-				<td>{{ after.start.strftime('%H:%M') }}</td>
-				<td>{{ after.end.strftime('%H:%M') if after.end != None else '--:--' }}</td>
+				<td>{{ current_user.local_datetime(after.start).strftime('%H:%M') }}</td>
+				<td>{{ current_user.local_datetime(after.end).strftime('%H:%M') if after.end != None else '--:--' }}</td>
 			</tr>
 		{% endfor %}
 	</tbody>

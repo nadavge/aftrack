@@ -6,7 +6,7 @@
 			<a href="{{ url_for('end_after') }}" class="btn btn-lg btn-danger">End :(</a>
 		</div>
 		<div class="row text-muted" style="margin-top:10px">
-			You seem to be on an after from <strong>{{ after.start.strftime('%H:%M') }}</strong>.
+			You seem to be on an after from <strong>{{ current_user.local_datetime(after.start).strftime('%H:%M') }}</strong>.
 		</div>
 	</div>
 {% else %}
