@@ -31,7 +31,7 @@ def read_key_file():
 	try:
 		with open(SECRET_KEY_FILE, 'rb') as secret_key_file:
 			secret_key = secret_key_file.read()
-	
+
 		if len(secret_key) != SECRET_KEY_LEN:
 			print("Secret key in file is not of valid length")
 
@@ -48,7 +48,7 @@ class Config(object):
 	CSRF_ENABLED = True
 	MAX_COOKIE_AGE = timedelta(days=30).total_seconds()
 	# TODO remove after deployment in case of other database
-	SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(os.path.join(BASEDIR, 'aftrack.db'))  
+	SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(os.path.join(BASEDIR, 'aftrack.db'))
 	SECRET_KEY = read_key_file()
 
 

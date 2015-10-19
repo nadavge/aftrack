@@ -70,8 +70,6 @@ def afters(year, month):
 		extract('month', After.date)==month
 	).all()
 
-	print(afters)
-
 	afters_sorted = sorted(afters,
 		key=lambda after: after.date, reverse=True)
 
