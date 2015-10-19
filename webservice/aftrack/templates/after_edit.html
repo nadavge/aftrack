@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block extra_head %}
+	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap-clockpicker.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap-datepicker3.min.css">
+	<script language="javascript" src="/static/js/bootstrap-clockpicker.min.js"></script>
+	<script language="javascript" src="/static/js/bootstrap-datepicker.min.js"></script>
+	<script language="javascript">
+		$().ready(function(){
+			$('.clockpicker').clockpicker();
+			$('.datepicker').datepicker({
+				format: "dd/mm/yyyy"
+			});
+		});
+	</script>
+{% endblock %}
+{% block content %}
+<form method="post" class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+	{{ form.hidden_tag() }}
+	<div class="row">
+		<div class="col-sm-6">
+			<label for="date">Date</label>
+			<input type="text" class="form-control datepicker" id="date" name="date"
+				value="{{ after.date.strftime('%d/%m/%Y') if after and after.date else '' }}">
+		</div>
+		<div class="col-sm-3">
+			<label for="start">From</label>
+			<input type="text" class="form-control clockpicker" id="start" name="start"
+				value="{{ after.start.strftime('%H:%M') if after and after.start else '' }}">
+		</div>
+		<div class="col-sm-3">
+			<label for="end">To</label>
+			<input type="text" class="form-control clockpicker" id="end" name="end"
+				value="{{ after.end.strftime('%H:%M') if after and after.end else '' }}">
+		</div>
+	</div>
+	<div class="row text-center" style="margin-top:20px;">
+		<button type="submit" class="btn btn-default">
+			<i class="glyphicon glyphicon-floppy-disk"></i>
+			Save
+		</button>
+	</div>
+</form>
+{% endblock %}

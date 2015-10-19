@@ -4,6 +4,7 @@ from wtforms import TextField, PasswordField, IntegerField
 from wtforms.validators import (Required,
 		Length, EqualTo, Regexp, ValidationError)
 from aftrack.models import User
+from datetime import datetime
 
 def length_kwargs(min, max):
 	return {'min': min,
@@ -77,4 +78,32 @@ class ChangePasswordForm(Form):
 			raise ValidationError(
 				'Wrong password'
 			)
+
+
+def validate_time(time_str):
+	try:
+		datetime.strptime(time_str, '%H:%M')
+	except ValueError:
+		raise ValidationError(
+			'Invalid date'
+		)
+
+class AfterForm(Form):
+	date = TextField('Date')
+	start = TextField('Start')
+	end = TextField('End')
+
+	def validate_date(self, field):
+		try:
+			datetime.strptime(field.data, '%d/%m/%Y')
+		except ValueError:
+			raise ValidationError(
+				'Invalid date'
+			)
+
+	def validate_start(self, field):
+		validate_time(field.data)
+
+	def validate_end(self, field):
+		validate_time(field.data)
 
