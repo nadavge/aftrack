@@ -2,7 +2,7 @@ from flask import request, redirect, render_template, url_for, flash, abort
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from aftrack import app, login_manager, db
 from aftrack.models import User, After
-from aftrack.forms import (LoginForm,
+from aftrack.forms import (LoginForm, AfterForm,
 	SignupForm, ProfileEditForm, ChangePasswordForm)
 from sqlalchemy import extract
 from datetime import datetime, timedelta
@@ -128,7 +128,7 @@ def signup():
 
 	if current_user.is_authenticated:
 		return redirect(url_for('home'))
-
+	print(form.username.data)
 	if request.method == 'POST' and form.validate():
 		user = User(username=form.username.data,
 				password=form.password.data,
@@ -193,6 +193,33 @@ def profile(username=None):
 	afters = sorted(user.afters, key=lambda after:after.date, reverse=True)
 
 	return render_template('profile.html', user=user, afters=afters)
+
+
+@app.route('/after/edit/<int:after_id>', methods=['GET', 'POST'])
+@login_required
+def edit_after(after_id):
+	after = After.query.get(after_id)
+	if not after:
+		abort(404)
+	if after.user != current_user and not current_user.admin:
+		abort(401)
+
+	form = AfterForm()
+
+	if request.method=='POST':
+		if not form.validate():
+			flash('Date or time format were awkward.. Try again', 'danger')
+		else:
+			after.date = datetime.strptime(form.date.data, '%d/%m/%Y').date()
+			after.start = datetime.strptime(form.start.data, '%H:%M').time()
+			after.end = datetime.strptime(form.end.data, '%H:%M').time()
+			db.session.commit()
+			flash('Saved successfully!', 'success')
+			return redirect(url_for('profile',
+				username=after.user.username if current_user!=after.user else None
+			))
+
+	return render_template('after_edit.html', form=form, after=after)
 
 
 @app.route('/after/start')
