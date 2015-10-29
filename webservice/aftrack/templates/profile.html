@@ -22,7 +22,11 @@
 				<th class="col-xs-4 col-sm-4" data-sorted="true" data-sorted-direction="descending">Date</th>
 				<th class="col-sm-3" data-sortable="false">From</th>
 				<th class="col-sm-3" data-sortable="false">To</th>
-				<th class="col-sm-2" data-sortable="false"><span class="glyphicon glyphicon-pencil"></span></th>
+				<th class="col-sm-2" data-sortable="false">
+					<a href="{{ url_for('add_after', username=user.username if current_user!=user else None) }}" class="btn btn-sm btn-default" style="display:inline">
+						<span class="glyphicon glyphicon-plus"></span>
+					</a>
+				</th>
 			</tr>
 		</thead>
 		<tbody>

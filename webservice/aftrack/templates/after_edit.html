@@ -12,6 +12,12 @@
 			});
 		});
 	</script>
+	<style>
+		input[readonly]
+		{
+			background-color:#FFF !important;
+		}
+	</style>
 {% endblock %}
 {% block content %}
 <form method="post" class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
@@ -19,17 +25,17 @@
 	<div class="row">
 		<div class="col-sm-6">
 			<label for="date">Date</label>
-			<input type="text" class="form-control datepicker" id="date" name="date"
+			<input type="text" class="form-control datepicker" id="date" name="date" readonly="readonly"
 				value="{{ current_user.local_datetime(after.start).strftime('%d/%m/%Y') if after and after.start else '' }}">
 		</div>
 		<div class="col-sm-3">
 			<label for="start">From</label>
-			<input type="text" class="form-control clockpicker" id="start" name="start"
+			<input type="text" class="form-control clockpicker" id="start" name="start" readonly="readonly"
 				value="{{ current_user.local_datetime(after.start).strftime('%H:%M') if after and after.start else '' }}">
 		</div>
 		<div class="col-sm-3">
 			<label for="end">To</label>
-			<input type="text" class="form-control clockpicker" id="end" name="end"
+			<input type="text" class="form-control clockpicker" id="end" name="end" readonly="readonly"
 				value="{{ current_user.local_datetime(after.end).strftime('%H:%M') if after and after.end else '' }}">
 		</div>
 	</div>

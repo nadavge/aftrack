@@ -207,6 +207,41 @@ def profile(username=None):
 	return render_template('profile.html', user=user, afters=afters)
 
 
+@app.route('/after/add', methods=['GET', 'POST'])
+@app.route('/after/add/<username>', methods=['GET', 'POST'])
+@login_required
+def add_after(username=None):
+	"""Add a completely new after"""
+	if username:
+		user = User.get_by_username(username)
+	else:
+		user = current_user
+	if user is None:
+		abort(404)
+	elif user != current_user and not current_user.admin:
+		abort(401)
+
+	form = AfterForm()
+
+	if request.method=='POST':
+		if not form.validate():
+			flash('Date or time format were awkward.. Try again', 'danger')
+		else:
+			local_start, local_end = form.parse()
+			after = After(user=user)
+			after.start = current_user.utc_datetime(local_start)
+			after.end = current_user.utc_datetime(local_end)
+			db.session.add(after)
+			db.session.commit()
+			flash('Added successfully!','success')
+
+			return redirect(url_for('profile',
+				username=after.user.username if current_user!=user else None
+			))
+
+	return render_template('after_edit.html', form=form)
+
+
 @app.route('/after/edit/<int:after_id>', methods=['GET', 'POST'])
 @login_required
 def edit_after(after_id):
@@ -223,16 +258,7 @@ def edit_after(after_id):
 		if not form.validate():
 			flash('Date or time format were awkward.. Try again', 'danger')
 		else:
-			local_date = datetime.strptime(form.date.data, '%d/%m/%Y').date()
-			local_start_time = datetime.strptime(form.start.data, '%H:%M').time()
-			local_start = datetime.combine(local_date, local_start_time)
-
-			local_end_time = datetime.strptime(form.end.data, '%H:%M').time()
-			local_end = datetime.combine(local_date, local_end_time)
-			# In case the end was after midnight
-			if local_end < local_start:
-				local_end += timedelta(days=1)
-
+			local_start, local_end = form.parse()
 			after.start = current_user.utc_datetime(local_start)
 			after.end = current_user.utc_datetime(local_end)
 			db.session.commit()

@@ -4,7 +4,7 @@ from wtforms import TextField, PasswordField, IntegerField
 from wtforms.validators import (Required,
 		Length, EqualTo, Regexp, ValidationError)
 from aftrack.models import User
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def length_kwargs(min, max):
 	return {'min': min,
@@ -85,7 +85,7 @@ def validate_time(time_str):
 		datetime.strptime(time_str, '%H:%M')
 	except ValueError:
 		raise ValidationError(
-			'Invalid date'
+			'Invalid time'
 		)
 
 class AfterForm(Form):
@@ -106,4 +106,19 @@ class AfterForm(Form):
 
 	def validate_end(self, field):
 		validate_time(field.data)
+
+	def parse(self):
+		"""Parse the form, and return a tuple of the
+		*local* start and enddatetimes"""
+		local_date = datetime.strptime(self.date.data, '%d/%m/%Y').date()
+		local_start_time = datetime.strptime(self.start.data, '%H:%M').time()
+		local_start = datetime.combine(local_date, local_start_time)
+
+		local_end_time = datetime.strptime(self.end.data, '%H:%M').time()
+		local_end = datetime.combine(local_date, local_end_time)
+		# In case the end was after midnight
+		if local_end < local_start:
+			local_end += timedelta(days=1)
+
+		return local_start, local_end
 
