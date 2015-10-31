@@ -4,10 +4,12 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from itsdangerous import TimedSerializer
 from datetime import time, datetime, timedelta
 from sqlalchemy import func
+from aftrack.utils.sqlalchemy_types import TimezoneType
+import pytz
 
 PASSWORD_HASH_LEN = 66 # Based on generate_password_hash output
 NEW_DAY_TIME = time(6,0) # 06:00 (AM)
-
+UTC_TZ = pytz.timezone('utc')
 
 
 class User(db.Model, UserMixin):
@@ -27,7 +29,7 @@ class User(db.Model, UserMixin):
 	last_name = db.Column(db.String(20))
 	yearbook = db.Column(db.Integer)
 	admin = db.Column(db.Boolean, default=False)
-	timezone = db.Column(db.Interval, default=timedelta(hours=3)) # Israel UTC+3
+	timezone = db.Column(TimezoneType, default=pytz.timezone('Asia/Jerusalem'))
 	afters = db.relationship('After', backref='user')
 
 	@staticmethod
@@ -66,14 +68,18 @@ class User(db.Model, UserMixin):
 		current datetime"""
 		if utc_datetime is None:
 			utc_datetime = datetime.utcnow()
-		return utc_datetime + self.timezone
+
+		utc_datetime = UTC_TZ.localize(utc_datetime)
+		return self.timezone.normalize(utc_datetime.astimezone(self.timezone))
 
 	def utc_datetime(self, local_datetime=None):
 		"""Converts a local datetime to utc datetime, if no datetime given
 		returns	current datetime"""
 		if local_datetime is None:
 			return datetime.utcnow()
-		return local_datetime - self.timezone
+
+		local_datetime = self.timezone.localize(local_datetime)
+		return UTC_TZ.normalize(local_datetime.astimezone(UTC_TZ))
 
 	def get_auth_token(self):
 		"""Generate auth token for cookie usage """
