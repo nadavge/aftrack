@@ -5,6 +5,7 @@ from aftrack import app, login_manager, db
 from aftrack.models import User, After
 from aftrack.forms import (LoginForm, AfterForm,
 	SignupForm, ProfileEditForm, ChangePasswordForm)
+from aftrack.utils import generate_signup_token
 from sqlalchemy import extract
 from datetime import datetime, timedelta
 from collections import OrderedDict
@@ -363,10 +364,7 @@ def api_signup_token():
 		return jsonify(status=0, error='Invalid parameters')
 
 	#TODO implement as a form
-	serializer = TimedSerializer(app.secret_key)
-
-	data = (period, yearbook)
-	token = base64_encode(serializer.dumps(data)).decode('utf-8')
+	token = generate_signup_token(period, yearbook)
 	return jsonify(status=1, token=token)
 
 def redirect_url(default='home'):
