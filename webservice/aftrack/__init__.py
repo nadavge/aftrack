@@ -13,5 +13,9 @@ login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
 
+from aftrack.utils import generate_csrf_token
+
+app.jinja_env.globals['csrf_token'] = generate_csrf_token
+
 from aftrack import views
 

@@ -5,7 +5,7 @@ from aftrack import app, login_manager, db
 from aftrack.models import User, After
 from aftrack.forms import (LoginForm, AfterForm,
 	SignupForm, ProfileEditForm, ChangePasswordForm)
-from aftrack.utils import generate_signup_token
+from aftrack.utils import generate_signup_token, csrf_required
 from sqlalchemy import extract
 from datetime import datetime, timedelta
 from collections import OrderedDict
@@ -350,6 +350,7 @@ def admin_panel():
 
 
 @app.route('/api/signup-token-generator', methods=['GET', 'POST'])
+@csrf_required
 def api_signup_token():
 	if not current_user.is_authenticated or not current_user.admin:
 		return jsonify(status=0, error='Unauthorized request')
@@ -366,6 +367,7 @@ def api_signup_token():
 	#TODO implement as a form
 	token = generate_signup_token(period, yearbook)
 	return jsonify(status=1, token=token)
+
 
 def redirect_url(default='home'):
 	"""Calculate the most fitting url to return to"""

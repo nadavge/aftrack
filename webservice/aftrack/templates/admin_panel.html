@@ -40,6 +40,7 @@ $(document).ready(function(){
 			</div>
 			<div class="panel-collapse collapse" id="collapseToken" style="padding:10px;">
 				<form id="token-form">
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 					<div class="form-group">
 						<label for="period">Period </label>
 						<select id="period" name="period" class="form-control">
