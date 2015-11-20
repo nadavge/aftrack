@@ -1,4 +1,5 @@
-from flask import request, redirect, render_template, url_for, flash, abort
+from flask import (request, redirect, render_template,
+	url_for, flash, abort, jsonify)
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from aftrack import app, login_manager, db
 from aftrack.models import User, After
@@ -7,6 +8,7 @@ from aftrack.forms import (LoginForm, AfterForm,
 from sqlalchemy import extract
 from datetime import datetime, timedelta
 from collections import OrderedDict
+from itsdangerous import TimedSerializer, SignatureExpired, base64_encode, base64_decode
 
 
 @app.errorhandler(401)
@@ -336,6 +338,28 @@ def end_after():
 		db.session.commit()
 	return redirect(redirect_url())
 
+
+@app.route('/api/signup-token-generator', methods=['GET', 'POST'])
+def api_signup_token():
+	if not current_user.is_authenticated or not current_user.admin:
+		return jsonify(status=0, error='Unauthorized request')
+
+	if not request.method=='POST':
+		return jsonify(status=0, error='Invalid request method')
+
+	yearbook = request.form.get('yearbook', type=int)
+	period = request.form.get('period', type=int)
+
+	print(yearbook, period)
+	if not yearbook or not period:
+		return jsonify(status=0, error='Invalid parameters')
+
+	#TODO implement as a form
+	serializer = TimedSerializer(app.secret_key)
+
+	data = (period, yearbook)
+	token = base64_encode(serializer.dumps(data)).decode('utf-8')
+	return jsonify(status=1, token=token)
 
 def redirect_url(default='home'):
 	"""Calculate the most fitting url to return to"""
