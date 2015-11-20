@@ -44,6 +44,12 @@
 			<i class="glyphicon glyphicon-floppy-disk"></i>
 			Save
 		</button>
+		{% if after %}
+			<a href="{{ url_for('delete_after', after_id=after.id) }}" class="btn btn-default">
+				<i class="glyphicon glyphicon-trash"></i>
+				Remove
+			</a>
+		{% endif %}
 	</div>
 </form>
 {% endblock %}

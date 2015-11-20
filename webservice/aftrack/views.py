@@ -270,6 +270,23 @@ def edit_after(after_id):
 	return render_template('after_edit.html', form=form, after=after)
 
 
+@app.route('/after/delete/<int:after_id>')
+@login_required
+def delete_after(after_id):
+	"""Delete an after"""
+	after = After.query.get(after_id)
+	if not after:
+		abort(404)
+	if after.user != current_user and not current_user.admin:
+		abort(401)
+
+	after_user = after.user
+
+	db.session.delete(after)
+	db.session.commit()
+	return redirect(url_for('profile', username=after_user.username))
+
+
 @app.route('/after/start')
 @login_required
 def start_after():
