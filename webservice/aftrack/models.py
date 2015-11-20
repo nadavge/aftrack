@@ -63,6 +63,11 @@ class User(db.Model, UserMixin):
 		"""An hmac usefol for the token authentication through a cookie"""
 		return make_secure_token(self.username, self.password)
 
+	@property
+	def full_name(self):
+		"""Concatenate the last name to the first name"""
+		return '%s %s'%(self.first_name, self.last_name)
+
 	def local_datetime(self, utc_datetime=None):
 		"""Converts datetime to local datetime, if no datetime given returns
 		current datetime"""

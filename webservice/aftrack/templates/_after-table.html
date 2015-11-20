@@ -23,7 +23,7 @@
 				</td>
 				<td>
 					<a href="{{ url_for('profile', username=after.user.username) }}">
-						{{ after.user.first_name }} {{ after.user.last_name }}
+						({{ after.user.yearbook }}) {{ after.user.full_name }}
 					</a>
 				</td>
 				<td>{{ current_user.local_datetime(after.start).strftime('%H:%M') }}</td>

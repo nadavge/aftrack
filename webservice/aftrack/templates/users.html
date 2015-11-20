@@ -4,13 +4,27 @@
 	<div class="text-center">
 		<h3 class="page-header">Users list</h3>
 	</div>
-	<ul class="list-group">
-	{% for user in users %}
-		<a class="list-group-item {{ 'list-group-item-warning' if user.get_active_after() }}"
-				href="{{ url_for('profile', username=user.username) }}">
-			{{ user.first_name }} {{ user.last_name }}
-		</a>
+	{% for yearbook in users_by_yearbook %}
+		<div class="panel-group" id="accordion{{ yearbook }}">
+			<div class="panel panel-default">
+				<div class="panel-heading" style="cursor: pointer;"
+					data-toggle="collapse" data-parent="#accordion{{ yearbook }}" data-target="#collapse{{ yearbook }}">
+					<h4 class="panel-title">
+						{{ yearbook }}
+					</h4>
+				</div>
+				<div class="panel-collapse collapse {{ 'in' if current_user.yearbook==yearbook else '' }}" id="collapse{{ yearbook }}">
+					<ul class="list-group">
+					{% for user in users_by_yearbook[yearbook] %}
+						<a class="list-group-item {{ 'list-group-item-warning' if user.get_active_after() }}"
+								href="{{ url_for('profile', username=user.username) }}">
+							{{ user.first_name }} {{ user.last_name }}
+						</a>
+					{% endfor %}
+					</ul>
+				</div>
+			</div>
+		</div>
 	{% endfor %}
-	</ul>
 </div>
 {% endblock %}

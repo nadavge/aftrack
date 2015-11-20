@@ -6,6 +6,7 @@ from aftrack.forms import (LoginForm, AfterForm,
 	SignupForm, ProfileEditForm, ChangePasswordForm)
 from sqlalchemy import extract
 from datetime import datetime, timedelta
+from collections import OrderedDict
 
 
 @app.errorhandler(401)
@@ -28,18 +29,18 @@ def home():
 	# TODO maybe seperate into two functions
 	if current_user.admin:
 		afters = After.query.filter(
-			After.user.has(User.yearbook==current_user.yearbook),
+			After.user.has(User.admin==False),
 			After.start > datetime.utcnow()-timedelta(days=7)
 		).all()
 		afters_sorted = sorted(afters,
 			key=lambda after: after.start, reverse=True)
 
 		on_after = User.query.filter(
+			User.admin==False,
 			User.afters.any(After.end==None),
-			User.yearbook==current_user.yearbook
 		)
 		on_after_sorted = sorted(on_after,
-			key=lambda user:'%s %s'%(user.first_name, user.last_name))
+			key=lambda user: user.full_name)
 		return render_template('home_admin.html',
 			on_after=on_after_sorted,
 			afters=afters_sorted
@@ -76,7 +77,7 @@ def afters(year, month):
 	lower_bound = datetime(year, month, 1)
 
 	afters = After.query.filter(
-		After.user.has(User.yearbook==current_user.yearbook),
+		After.user.has(User.admin==False),
 		After.start < current_user.utc_datetime(upper_bound),
 		After.start >= current_user.utc_datetime(lower_bound)
 	).all()
@@ -98,11 +99,28 @@ def users():
 	if not current_user.admin:
 		abort(401)
 
-	user_list = sorted(
-		User.query.filter_by(yearbook=current_user.yearbook, admin=False).all(),
-		key=lambda user: "%s %s"%(user.first_name, user.last_name)
-	)
-	return render_template('users.html', users=user_list)
+	#TODO add dynamic years from admin panel
+	#@admin_panel
+	lowest_yearbook = 35
+	highest_yearbook = 37
+	users = User.query.filter(
+		User.yearbook>=lowest_yearbook,
+		User.yearbook<=highest_yearbook,
+		User.admin==False
+	).order_by(User.first_name, User.last_name).all()
+
+	users_by_yearbook = OrderedDict()
+
+	# Add the admin's key first, so it will show first
+	#users_by_yearbook[current_user.yearbook] = []
+
+	for yearbook in range(lowest_yearbook, highest_yearbook+1):
+		users_by_yearbook[yearbook] = []
+
+	for user in users:
+		users_by_yearbook[user.yearbook].append(user)
+
+	return render_template('users.html', users_by_yearbook=users_by_yearbook)
 
 
 @app.route('/logout')

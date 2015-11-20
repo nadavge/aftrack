@@ -10,7 +10,7 @@
 							{% for user in on_after %}
 								<li>
 									<a href="{{ url_for('profile', username=user.username) }}">
-									{{ user.first_name }} {{ user.last_name }}
+									({{ user.yearbook }}) {{ user.full_name }}
 									</a>
 								</li>
 							{% endfor %}
