@@ -15,40 +15,42 @@
 			<a href="{{ url_for('profile_edit', username=user.username) }}">Edit</a>
 		{% endif %}
 </div>
-<div class="col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
-	<table class="sortable-theme-bootstrap table table-hover table-responsive" data-sortable>
-		<thead>
-			<tr>
-				<th class="col-xs-4 col-sm-4" data-sorted="true" data-sorted-direction="descending">Date</th>
-				<th class="col-sm-3" data-sortable="false">From</th>
-				<th class="col-sm-3" data-sortable="false">To</th>
-				<th class="col-sm-2" data-sortable="false">
-					<a href="{{ url_for('add_after', username=user.username if current_user!=user else None) }}" class="btn btn-sm btn-default" style="display:inline">
-						<span class="glyphicon glyphicon-plus"></span>
-					</a>
-				</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for after in afters %}
-				{% if after.end %}
-					<tr>
-				{% else %}
-					<tr class='warning'>
-				{% endif %}
-					<td data-value="{{ after.start.strftime('%s') }}">
-						{{ current_user.local_datetime(after.start).strftime('%d/%m/%y') }}
-					</td>
-					<td>{{ current_user.local_datetime(after.start).strftime('%H:%M') }}</td>
-					<td>{{ current_user.local_datetime(after.end).strftime('%H:%M') if after.end != None else '--:--' }}</td>
-					<td>
-						<a href="{{ url_for('edit_after', after_id=after.id) }}" class="btn btn-sm btn-default">
-							<span class="glyphicon glyphicon-pencil"></span>
+{% if not user.admin %}
+	<div class="col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+		<table class="sortable-theme-bootstrap table table-hover table-responsive" data-sortable>
+			<thead>
+				<tr>
+					<th class="col-xs-4 col-sm-4" data-sorted="true" data-sorted-direction="descending">Date</th>
+					<th class="col-sm-3" data-sortable="false">From</th>
+					<th class="col-sm-3" data-sortable="false">To</th>
+					<th class="col-sm-2" data-sortable="false">
+						<a href="{{ url_for('add_after', username=user.username if current_user!=user else None) }}" class="btn btn-sm btn-default" style="display:inline">
+							<span class="glyphicon glyphicon-plus"></span>
 						</a>
-					</td>
+					</th>
 				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-</div>
+			</thead>
+			<tbody>
+				{% for after in afters %}
+					{% if after.end %}
+						<tr>
+					{% else %}
+						<tr class='warning'>
+					{% endif %}
+						<td data-value="{{ after.start.strftime('%s') }}">
+							{{ current_user.local_datetime(after.start).strftime('%d/%m/%y') }}
+						</td>
+						<td>{{ current_user.local_datetime(after.start).strftime('%H:%M') }}</td>
+						<td>{{ current_user.local_datetime(after.end).strftime('%H:%M') if after.end != None else '--:--' }}</td>
+						<td>
+							<a href="{{ url_for('edit_after', after_id=after.id) }}" class="btn btn-sm btn-default">
+								<span class="glyphicon glyphicon-pencil"></span>
+							</a>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endif %}
 {% endblock %}

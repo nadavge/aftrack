@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<script language="javascript">
+$(document).ready(function(){
+	$("#signup-token").val("");
+
+	$("button#token-generate").click(function(){
+		$.post("/api/signup-token-generator", $("#token-form").serialize(),
+			function(data, status){
+				if (data.status) {
+					$("#signup-token").val(data.token).parent().removeClass("has-error").addClass("has-success");
+				} else {
+					$("#signup-token").val(data.error).parent().removeClass("has-sucess").addClass("has-error");
+				}
+				$("#signup-token").focus();
+			}
+		);
+	});
+
+	$("#signup-token").focus(function() { $(this).select(); } );
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+	<div class="page-header">
+		<h3>
+		Admin Panel
+		</h3>
+	</div>
+	<div class="panel-group" id="accordionToken">
+		<div class="panel panel-default">
+			<div class="panel-heading" style="cursor: pointer;"
+				data-toggle="collapse" data-parent="#accordionToken" data-target="#collapseToken">
+				<h4 class="panel-title">
+					Sign Up Token
+				</h4>
+			</div>
+			<div class="panel-collapse collapse" id="collapseToken" style="padding:10px;">
+				<form id="token-form">
+					<div class="form-group">
+						<label for="period">Period </label>
+						<select id="period" name="period" class="form-control">
+							<option value="3600">1 Hour</option>
+							<option value="10800">3 Hours</option>
+							<option value="86400">24 Hours</option>
+							<option value="259200">3 Days</option>
+							<option value="604800">1 Week</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="yearbook">Yearbook </label>
+						<select id="yearbook" name="yearbook" class="form-control">
+							{% for yearbook in range(35, 37+1) %}
+								<!--@admin_panel Fix this and add dynamic years -->
+								<option value="{{ yearbook }}">{{ yearbook }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</form>
+				<div class="form-group">
+					<input type="text" id="signup-token" class="form-control" readonly>
+				</div>
+				<div class="text-center">
+					<button id="token-generate" class="btn btn-primary">Generate token</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

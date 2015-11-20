@@ -339,6 +339,15 @@ def end_after():
 	return redirect(redirect_url())
 
 
+@app.route('/admin')
+@login_required
+def admin_panel():
+	if not current_user.admin:
+		abort(401)
+
+	return render_template('admin_panel.html')
+
+
 @app.route('/api/signup-token-generator', methods=['GET', 'POST'])
 def api_signup_token():
 	if not current_user.is_authenticated or not current_user.admin:
@@ -350,8 +359,7 @@ def api_signup_token():
 	yearbook = request.form.get('yearbook', type=int)
 	period = request.form.get('period', type=int)
 
-	print(yearbook, period)
-	if not yearbook or not period:
+	if not yearbook or not period or period > 60*60*24*7:
 		return jsonify(status=0, error='Invalid parameters')
 
 	#TODO implement as a form

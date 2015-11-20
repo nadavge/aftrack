@@ -4,6 +4,7 @@
 		{% if current_user.admin %}
 			<li><a href="{{ url_for('afters_now') }}">Afters</a></li>
 			<li><a href="{{ url_for('users') }}">Users</a></li>
+			<li><a href="{{ url_for('admin_panel') }}">Admin</a></li>
 		{% endif %}
 	{% endif %}
 </ul>
