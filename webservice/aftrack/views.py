@@ -99,7 +99,7 @@ def users():
 		abort(401)
 
 	user_list = sorted(
-		User.query.filter_by(yearbook=current_user.yearbook).all(),
+		User.query.filter_by(yearbook=current_user.yearbook, admin=False).all(),
 		key=lambda user: "%s %s"%(user.first_name, user.last_name)
 	)
 	return render_template('users.html', users=user_list)
