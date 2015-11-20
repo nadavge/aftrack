@@ -165,7 +165,7 @@ def signup():
 				password=form.password.data,
 				first_name=form.first_name.data,
 				last_name=form.last_name.data,
-				yearbook=form.yearbook.data)
+				yearbook=form.yearbook)
 		db.session.add(user)
 		db.session.commit()
 		flash('Signed-up succesfully, you may now login.', 'success')

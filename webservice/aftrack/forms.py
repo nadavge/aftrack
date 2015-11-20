@@ -4,6 +4,7 @@ from wtforms import TextField, PasswordField, IntegerField
 from wtforms.validators import (Required,
 		Length, EqualTo, Regexp, ValidationError)
 from aftrack.models import User
+from aftrack.utils import parse_signup_token
 from datetime import datetime, timedelta
 
 def length_kwargs(min, max):
@@ -36,7 +37,12 @@ class SignupForm(Form):
 			Required(),
 			Regexp("^[A-z][A-z ',-]*$", message='Invalid characters.'),
 			Length(**length_kwargs(User.MIN_LAST_NAME, User.MAX_LAST_NAME))])
-	yearbook = IntegerField('Yearbook', validators=[Required()])
+	token = TextField('Token', validators=[Required()])
+
+	@property
+	def yearbook(self):
+		success, yearbook = parse_signup_token(self.token.data)
+		return yearbook
 
 	def validate_username(self, field):
 		user = User.query.filter(
@@ -44,8 +50,13 @@ class SignupForm(Form):
 		).first()
 		if user:
 			raise ValidationError(
-					'Username already taken.'
+				'Username already taken.'
 			)
+
+	def validate_token(self, field):
+		success, error = parse_signup_token(field.data)
+		if not success:
+			raise ValidationError(error)
 
 
 class ProfileEditForm(Form):
